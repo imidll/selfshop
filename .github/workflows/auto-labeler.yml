@@ -11,4 +11,5 @@ permissions:
 jobs:
   apply-labels:
     runs-on: ubuntu-latest
+    name: Apply
     steps: [ uses: fuxingloh/multi-labeler@v5 ]
