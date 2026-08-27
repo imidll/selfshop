@@ -1,0 +1,59 @@
+version: 2
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+run:
+  modules-download-mode: readonly
+  timeout: 5m
+
+linters:
+  default: none
+  enable:
+    # Correctness / security
+    - errcheck
+    - sloglint
+    - wastedassign
+    - govet
+    - gosec
+    - staticcheck
+    - ineffassign
+    - copyloopvar
+    - loggercheck
+    - unused
+    - nilerr
+    - nilnil
+    - errchkjson
+    - nilnesserr
+    - fatcontext
+    - asciicheck
+    - bidichk
+    - gocheckcompilerdirectives
+    - errorlint
+    - asasalint
+    - durationcheck
+
+    # Tests
+    - testifylint
+    - testableexamples
+    - thelper
+    - usetesting
+    # - paralleltest
+    # - tparallel
+
+  settings:
+    govet:       { enable-all: true, disable: [ fieldalignment ] }
+    testifylint: { enable-all: true }
+
+formatters:
+  enable:
+    - goimports
+    - gofmt
+
+  settings:
+    goimports: { local-prefixes: [ github.com/imidll/selfshop ] }
+    gofmt:
+      rewrite-rules:
+        - pattern:     'interface{}'
+          replacement: 'any'
