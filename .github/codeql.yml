@@ -1,0 +1,10 @@
+name: "codeql configuration"
+
+disable-default-queries: false
+queries:
+  - uses: security-and-quality
+
+paths-ignore:
+  - "**/vendor/**"
+  - "**/mocks/**"
+  - "**/testdata/**"
