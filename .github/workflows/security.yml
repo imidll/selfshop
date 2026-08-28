@@ -1,4 +1,4 @@
-name: Security
+name: Security Scan
 
 on:
   pull_request: { branches: [ main ] }
@@ -16,7 +16,7 @@ env:
 jobs:
   govulncheck:
     runs-on: ubuntu-latest
-    name: GoVulncheck
+    name: govulncheck
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -38,7 +38,7 @@ jobs:
 
   trivy:
     runs-on: ubuntu-latest
-    name: Trivy
+    name: trivy
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -52,6 +52,7 @@ jobs:
           format: sarif
           output: trivy-results.sarif
           exit-code: '1'
+          limit-severities-for-sarif: true
 
       - name: Upload Trivy results to GitHub Security
         if: always()
