@@ -49,10 +49,9 @@ jobs:
           scan-type: fs
           scan-ref: .
           severity: CRITICAL,HIGH
-          format: sarif
-          output: trivy-results.sarif
+          scanners: vuln
+          format: table
           exit-code: '1'
-          limit-severities-for-sarif: true
 
       - name: Upload Trivy results to GitHub Security
         if: always()
