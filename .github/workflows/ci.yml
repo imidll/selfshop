@@ -8,6 +8,9 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  BIN_DIR: ${{ github.workspace }}/bin
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -26,19 +29,15 @@ jobs:
         run: |
           go mod tidy
           git diff --exit-code -- go.mod go.sum
-      
-      - name: Install tools
-        run: |
-          if grep -q "^tool" go.mod; then
-            GOBIN="$GITHUB_WORKSPACE/bin" go install tool
-          else
-            echo "No tools defined in go.mod, skipping"
-          fi
+
+      - name: Install mockgen
+        run: GOBIN="$BIN_DIR" go install go.uber.org/mock/mockgen
+
+      - name: Add tools to PATH
+        run: echo "$BIN_DIR" >> "$GITHUB_PATH"
 
       - name: Generate
-        run: |
-          export PATH="$GITHUB_WORKSPACE/bin:$PATH"
-          go generate ./...
+        run: go generate ./...
 
       - name: Check generated files
         run: git diff --exit-code
@@ -63,18 +62,14 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Install tools
-        run: |
-          if grep -q "^tool" go.mod; then
-            GOBIN="$GITHUB_WORKSPACE/bin" go install tool
-          else
-            echo "No tools defined in go.mod, skipping"
-          fi
+      - name: Install mockgen
+        run: GOBIN="$BIN_DIR" go install go.uber.org/mock/mockgen
+
+      - name: Add tools to PATH
+        run: echo "$BIN_DIR" >> "$GITHUB_PATH"
 
       - name: Generate
-        run: |
-          export PATH="$GITHUB_WORKSPACE/bin:$PATH"
-          go generate ./...
+        run: go generate ./...
 
       - name: Check generated files
         run: git diff --exit-code
@@ -89,7 +84,7 @@ jobs:
         run: |
           packages=$(
             go list ./pkg/... |
-            grep -v -E '/(mocks|testdata)(/|$)' || true
+            grep -v -E '/(vendor|mocks|testdata)(/|$)' || true
           )
           test -n "$packages"
           go test \
@@ -101,20 +96,25 @@ jobs:
       - name: Coverage report
         run: |
           go tool cover -func=coverage.out | tee coverage.txt
-
           coverage=$(
             awk '/^total:/ {
               gsub("%", "", $3)
               print $3
             }' coverage.txt
           )
-
           awk -v coverage="$coverage" 'BEGIN {
             if (coverage < 100) {
               printf "coverage is %.1f%%, required 100.0%%\n", coverage
               exit 1
             }
           }'
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.out
+          fail_ci_if_error: true
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v7
