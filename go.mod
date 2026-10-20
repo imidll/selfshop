@@ -7,7 +7,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/knadh/koanf/providers/confmap v1.0.1
 	github.com/knadh/koanf/providers/env/v2 v2.0.1
-	github.com/knadh/koanf/v2 v2.3.6
+	github.com/knadh/koanf/v2 v2.4.0
 	github.com/stretchr/testify v1.12.1
 	go.uber.org/mock v0.6.0
 	go.uber.org/zap v1.28.0
